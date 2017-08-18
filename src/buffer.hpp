@@ -18,6 +18,7 @@ namespace elelel {
     void push_back(const void* data, const size_t sz); // Copy data into buf
     void clear(); // Clears data from buffer
     void resize(const size_t capacity); // Resizes the buffer, behaves like realloc in respect to sizes, runs defragmentation inside
+    void adjust_size_by(const size_t delta); // Adds delta to current size (for adding data in raw mode)
     void defragment(); // If the data is not aligned with start or fragmented, aligns it with buf_ start and defragments
 
     const void* begin() const;  // Pointer to data start

@@ -148,6 +148,10 @@ void elelel::network_buffer::resize(const size_t sz) {
   buf_ = new_buf;
 }
 
+void elelel::network_buffer::adjust_size_by(const size_t delta) {
+  count_ += delta;
+}
+
 void elelel::network_buffer::defragment() {
   if (begin_pos_ != 0) {
     const auto begin_p = (void*)((uintptr_t)buf_ + begin_pos_);
