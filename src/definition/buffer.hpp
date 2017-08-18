@@ -175,7 +175,13 @@ void elelel::network_buffer::defragment() {
 
 void elelel::network_buffer::push_back(const void* data, const size_t sz) {
   const size_t free_space = capacity_ - count_;
-  if (sz > free_space) throw std::runtime_error("elelel::network_buffer out of buffer space");
+  if (sz > free_space) {
+    if (autogrow_ && (autogrow_limit - count_ >= sz)) {
+      resize(sz);
+    } else {
+      throw std::runtime_error("elelel::network_buffer out of buffer space");
+    }
+  }
   void* p;
   if (is_fragmented()) {
     const size_t head_sz = capacity_ - begin_pos_;
