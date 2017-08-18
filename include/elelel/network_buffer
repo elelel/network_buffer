@@ -1,0 +1,4 @@
+#pragma once
+
+#include "../../src/buffer.hpp"
+#include "../../src/definition/buffer.hpp"
