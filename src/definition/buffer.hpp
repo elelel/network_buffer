@@ -114,6 +114,13 @@ void elelel::network_buffer::reset(const size_t capacity) {
 
 void elelel::network_buffer::pop_front(const size_t sz) {
   // Caller is responsible to ensure sz <= size()
+
+  // Update statistics on used buffer size
+  ++size_n_;
+  const auto delta = count_ - size_E_;
+  size_E_ += delta / double(size_n_);
+  size_M2_ += delta * (count_ - size_E_);
+
   if (is_fragmented()) {
     const size_t head_sz = capacity_ - begin_pos_;
     const size_t tail_sz = count_ - head_sz;
@@ -130,12 +137,6 @@ void elelel::network_buffer::pop_front(const size_t sz) {
     }
   }
   count_ -= sz;
-  
-  // Update statistics on used buffer size
-  ++size_n_;
-  const auto delta = count_ - size_E_;
-  size_E_ += delta / double(size_n_);
-  size_M2_ += delta * (count_ - size_E_);
 }
 
 void elelel::network_buffer::resize(const size_t sz) {
