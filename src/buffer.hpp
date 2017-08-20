@@ -31,7 +31,7 @@ namespace elelel {
     size_t head_size() const; // Size of head data fragment
     size_t tail_size() const; // Size of tail data fragment
     size_t free_size() const; // Total free bytes
-    size_t free_size_unfragmented() const; // Num of free bytes after end()
+    size_t unfragmented_free_size() const; // Num of free bytes after end()
 
     bool& autogrow();
     size_t& autogrow_limit();

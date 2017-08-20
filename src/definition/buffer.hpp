@@ -58,6 +58,8 @@ elelel::network_buffer::network_buffer(type&& other) :
   size_n_(std::move(other.size_n_)),
   size_E_(std::move(other.size_E_)),
   size_M2_(std::move(other.size_M2_)) {
+  other.buf_ = nullptr;
+  other.count_ = 0;
   }
 
 void elelel::network_buffer::swap(type& other) {
@@ -250,7 +252,7 @@ size_t elelel::network_buffer::free_size() const {
   return capacity_ - count_;
 }
 
-size_t elelel::network_buffer::free_size_unfragmented() const {
+size_t elelel::network_buffer::unfragmented_free_size() const {
   if (is_fragmented()) {
     const size_t head_sz = capacity_ - begin_pos_;
     const size_t tail_sz = count_ - (capacity_ - begin_pos_);
