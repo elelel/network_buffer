@@ -3,8 +3,6 @@
 #include <cstring>
 #include <exception>
 
-#include <iostream>
-
 inline elelel::network_buffer::network_buffer::~network_buffer() {
   if (buf_ != nullptr) {
     free(buf_);
@@ -43,7 +41,6 @@ inline elelel::network_buffer::network_buffer(const type& other) :
   size_M2_{other.size_M2_} {
     // Since it we are copying anyway, take advantage of this to defragment the data
     buf_ = malloc(capacity_);
-    std::cout << "Copy constructor buffer malloc\n" << "\n";
     if (buf_ == nullptr) throw std::bad_alloc();
     memcpy(buf_, (void*)((uintptr_t)other.buf_ + other.begin_pos_), other.head_size());
     memcpy((void*)((uintptr_t)buf_ + other.head_size()), other.buf_, other.tail_size());
@@ -101,12 +98,10 @@ inline void elelel::network_buffer::reset() {
 inline void elelel::network_buffer::reset(const size_t capacity) {
   if (buf_ != nullptr) {
     auto new_buf = realloc(buf_, capacity_);
-    std::cout << "reset realloc\n";
     if (new_buf == nullptr) throw std::bad_alloc();
     buf_ = new_buf;
   } else {
     buf_ = malloc(capacity_);
-    std::cout << "reset malloc\n";
     if (buf_ == nullptr) throw std::bad_alloc();
   }
   capacity_ = capacity;
@@ -155,7 +150,6 @@ inline void elelel::network_buffer::resize(const size_t sz) {
   capacity_ = sz;
   if (count_ > sz) count_ = sz;
   auto new_buf = realloc(buf_, sz);
-  std::cout << "resize realloc\n";
   if (new_buf == nullptr) throw std::bad_alloc();
   buf_ = new_buf;
 }
@@ -169,7 +163,6 @@ inline void elelel::network_buffer::defragment() {
     const auto begin_p = (void*)((uintptr_t)buf_ + begin_pos_);
     if (is_fragmented()) {
       void* p = malloc(capacity_);
-      std::cout << "defragment malloc\n";
       if (buf_ == nullptr) {
         throw std::bad_alloc();
       }
