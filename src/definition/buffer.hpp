@@ -198,7 +198,7 @@ inline void elelel::network_buffer::push_back(const void* data, const size_t sz)
 
 inline size_t elelel::network_buffer::push_back_unfragmented(const void* data, const size_t sz) {
   const size_t head_sz = count_ ? capacity_ - begin_pos_ : 0;
-  const size_t after_head_free_sz = begin_pos_ + count_ < capacity_ ? ecapacity_ - (begin_pos_ + count_) : 0;
+  const size_t after_head_free_sz = begin_pos_ + count_ < capacity_ ? capacity_ - (begin_pos_ + count_) : 0;
   
   void* dest;
   size_t copy_sz;
@@ -221,12 +221,14 @@ inline const void* elelel::network_buffer::begin() const {
 }
 
 inline void* elelel::network_buffer::end() const {
-  if (is_fragmented()) {
+  if (begin_pos_ + count_ > capacity_) {
     const size_t head_sz = capacity_ - begin_pos_;
     const size_t tail_sz = count_ - head_sz;
     return (void*)((uintptr_t)buf_ + tail_sz);
-  } 
-  return (void*)((uintptr_t)buf_ + begin_pos_ + count_);
+  } else {
+    if (begin_pos_ + count_ == capacity_) return buf_;
+    else return (void*)((uintptr_t)buf_ + begin_pos_ + count_);
+  }
 }
 
 inline bool elelel::network_buffer::is_fragmented() const {
