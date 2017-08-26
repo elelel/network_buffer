@@ -128,11 +128,7 @@ inline void elelel::network_buffer::pop_front(const size_t sz) {
         begin_pos_ = sz - (capacity_ - begin_pos_);
       }
     } else {
-      if (sz == count_) {
-        begin_pos_ = 0;
-      } else {
-        begin_pos_ += sz;
-      }
+      begin_pos_ += sz;
     }
     count_ -= sz;
   } else {
@@ -197,8 +193,14 @@ inline void elelel::network_buffer::push_back(const void* data, const size_t sz)
 }
 
 inline size_t elelel::network_buffer::push_back_unfragmented(const void* data, const size_t sz) {
-  const size_t head_sz = count_ ? capacity_ - begin_pos_ : 0;
-  const size_t after_head_free_sz = begin_pos_ + count_ < capacity_ ? capacity_ - (begin_pos_ + count_) : 0;
+  size_t head_sz{0};
+  size_t after_head_free_sz{capacity_};
+  if (count_ != 0) {
+    head_sz = begin_pos_ + count_ > capacity_ ? capacity_ - begin_pos_ : count_;
+    after_head_free_sz = begin_pos_ + count_ < capacity_ ? capacity_ - (begin_pos_ + count_) : 0;
+  } else {
+    begin_pos_ = 0;
+  }
   
   void* dest;
   size_t copy_sz;
