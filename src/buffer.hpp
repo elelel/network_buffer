@@ -16,6 +16,8 @@ namespace elelel {
     void reset(const size_t capacity); // Resets counters, allocs or reallocs memory for the capacity
     void pop_front(const size_t sz);  // Release data from buf start
     void push_back(const void* data, const size_t sz); // Copy data into buf
+    size_t push_back_unfragmented(const void* data, const size_t sz); // Push the maximum unfragmentd chunk of data possible, return num bytes left
+    
     void clear(); // Clears data from buffer
     void resize(const size_t capacity); // Resizes the buffer, behaves like realloc in respect to sizes, runs defragmentation inside
     void adjust_size_by(const size_t delta); // Adds delta to current size (for adding data in raw mode)
@@ -53,5 +55,6 @@ namespace elelel {
     double size_E_;       // Current expectation
     double size_M2_;      // Sum of squares of differences
 
+    void check_free_space(const size_t sz); // Check for free space, autogrow or throw
   };
 }

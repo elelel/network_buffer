@@ -179,7 +179,7 @@ inline void elelel::network_buffer::defragment() {
   begin_pos_ = 0;
 }
 
-inline void elelel::network_buffer::push_back(const void* data, const size_t sz) {
+inline void elelel::network_buffer::check_free_space(const size_t sz) {
   const size_t free_space = capacity_ - count_;
   if (sz > free_space) {
     if (autogrow_ && (autogrow_limit_ - count_ >= sz)) {
@@ -188,21 +188,32 @@ inline void elelel::network_buffer::push_back(const void* data, const size_t sz)
       throw std::runtime_error("elelel::network_buffer out of buffer space");
     }
   }
-  if (is_fragmented()) {
-    const size_t head_sz = capacity_ - begin_pos_;
-    const size_t tail_sz = count_ - head_sz;
-    memcpy((void*)((uintptr_t)buf_ + tail_sz), data, sz);
+}
+
+inline void elelel::network_buffer::push_back(const void* data, const size_t sz) {
+  check_free_space(sz);
+  auto bytes_left = push_back_unfragmented(data, sz);
+  if (bytes_left > 0) push_back_unfragmented((void*)((uintptr_t)data + (sz - bytes_left)), bytes_left);
+}
+
+inline size_t elelel::network_buffer::push_back_unfragmented(const void* data, const size_t sz) {
+  const size_t head_sz = count_ ? capacity_ - begin_pos_ : 0;
+  const size_t after_head_free_sz = begin_pos_ + count_ < capacity_ ? ecapacity_ - (begin_pos_ + count_) : 0;
+  
+  void* dest;
+  size_t copy_sz;
+  if (after_head_free_sz == 0) {
+    copy_sz = capacity_ - count_;   // Free space after tail
+    if (copy_sz > sz) copy_sz = sz;
+    // Destination is after the end of the tail
+    dest = (void*)((uintptr_t)buf_ + (count_ - head_sz));
   } else {
-    const size_t head_sz = count_ ? capacity_ - begin_pos_ : 0;
-    const size_t after_head_sz = count_ ? capacity_ - (begin_pos_ + count_) : capacity_;
-    if (after_head_sz >= sz) {
-      memcpy((void*)((uintptr_t)buf_ + begin_pos_ + head_sz), data, sz);
-    } else {
-      memcpy((void*)((uintptr_t)buf_ + begin_pos_ + head_sz), data, after_head_sz);
-      memcpy(buf_, (void*)((uintptr_t)data + after_head_sz), sz - after_head_sz);
-    }
+    if (after_head_free_sz >= sz) copy_sz = sz; else copy_sz = after_head_free_sz;
+    dest = (void*)((uintptr_t)buf_ + (begin_pos_ + head_sz));
   }
-  count_ += sz;
+  memcpy(dest, data, copy_sz);
+  count_ += copy_sz;
+  return sz - copy_sz;
 }
 
 inline const void* elelel::network_buffer::begin() const {

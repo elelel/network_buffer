@@ -31,7 +31,7 @@ bool operator==(const network_buffer& buf, const std::string& string) {
   };
 
   // std::cout << "Start compare cycle\n";
-  for (auto i = 0; i < s.size(); ++i) {
+  for (size_t i = 0; i < s.size(); ++i) {
     // std::cout << " Comparing s[" << i << "] = " << s[i] << " and b[" << i << "] = " << b[i] << std::endl;
     if ((within_tail(i) || within_head(i))) {
       if (((s[i] != '_') && (b[i] != s[i])) || (s[i] == '_')) return false;
