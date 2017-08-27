@@ -159,7 +159,7 @@ inline void elelel::network_buffer::defragment() {
     const auto begin_p = (void*)((uintptr_t)buf_ + begin_pos_);
     if (is_fragmented()) {
       void* p = malloc(capacity_);
-      if (buf_ == nullptr) {
+      if (p == nullptr) {
         throw std::bad_alloc();
       }
       const size_t head_sz = capacity_ - begin_pos_;
